@@ -21,10 +21,7 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
-  const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0));
-
-  const maxVotes = Math.max(...votes);
-  const maxIndex = votes.indexOf(maxVotes);
+  const [votes, setVotes] = useState(new Int16Array(anecdotes.length).fill(0));
 
   return (
     <div>
@@ -46,10 +43,16 @@ const App = () => {
       />
 
       <h1>Anecdote with most votes</h1>
-      {anecdotes[maxIndex]}
+      {
+        anecdotes[
+          votes.findIndex((it) => votes.toSorted()[votes.length - 1] == it)
+        ]
+      }
       <br />
+      {votes.length}
       <br />
-      <p>has {maxVotes} votes</p>
+      {votes.toSorted()}
+      <p>has {votes.toSorted()[votes.length - 1]} votes</p>
     </div>
   );
 };
