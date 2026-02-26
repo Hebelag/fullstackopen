@@ -6,9 +6,14 @@ const App = () => {
 
   const handleAddPerson = (event) => {
     event.preventDefault();
-    const newPObject = { name: newName };
-    setPersons(persons.concat(newPObject));
-    setNewName("");
+    const names = persons.map((a) => a.name);
+    if (names.find((a) => a === newName)) {
+      alert(`${newName} is already added to phonebook`);
+    } else {
+      const newPObject = { name: newName };
+      setPersons(persons.concat(newPObject));
+      setNewName("");
+    }
   };
 
   const handleInput = (event) => {
