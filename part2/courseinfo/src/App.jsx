@@ -20,13 +20,20 @@ const Header = ({ text }) => {
 };
 
 const Content = ({ parts }) => {
-  return parts.map((p) => {
+  const partList = parts.map((p) => {
     return (
       <div key={p.id}>
         <Part part={p} />
       </div>
     );
   });
+
+  return (
+    <>
+      {partList}
+      <Total parts={parts} />
+    </>
+  );
 };
 
 const Part = ({ part }) => {
@@ -35,6 +42,14 @@ const Part = ({ part }) => {
       {part.name} {part.exercises}
     </p>
   );
+};
+
+const Total = ({ parts }) => {
+  const total = parts.reduce((acc, curr) => {
+    return acc + curr.exercises;
+  }, 0);
+
+  return <h3>total of {total} exercises</h3>;
 };
 
 const App = () => {
@@ -56,6 +71,11 @@ const App = () => {
         name: "State of a component",
         exercises: 14,
         id: 3,
+      },
+      {
+        name: "Redux",
+        exercises: 11,
+        id: 4,
       },
     ],
   };
