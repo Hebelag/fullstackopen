@@ -1,5 +1,48 @@
 import { useState } from "react";
 
+const Filter = ({ onHandleNameFilter, nameFilter }) => {
+  return (
+    <p>
+      Filter shown with{" "}
+      <input onChange={onHandleNameFilter} value={nameFilter} />
+    </p>
+  );
+};
+
+const PersonForm = ({
+  onSubmit,
+  onNameInputChange,
+  nameValue,
+  onNumberInputChange,
+  numberValue,
+}) => {
+  return (
+    <form onSubmit={onSubmit}>
+      <div>
+        name: <input onChange={onNameInputChange} value={nameValue} />
+      </div>
+      <div>
+        number: <input onChange={onNumberInputChange} value={numberValue} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
+};
+
+const Persons = ({ persons, nameFilter }) => {
+  return persons
+    .filter((p) => p.name.toLowerCase().includes(nameFilter.toLowerCase()))
+    .map((p) => {
+      return (
+        <p key={p.name}>
+          {p.name} {p.number}
+        </p>
+      );
+    });
+};
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", number: "040-123456", id: 1 },
@@ -39,31 +82,21 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <p>
-        Filter shown with{" "}
-        <input onChange={handleInputNameFilter} value={nameFilter} />
-      </p>
-      <form onSubmit={handleAddPerson}>
-        <div>
-          name: <input onChange={handleInputName} value={newName} />
-        </div>
-        <div>
-          number: <input onChange={handleInputNumber} value={newNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter
+        onHandleNameFilter={handleInputNameFilter}
+        nameFilter={nameFilter}
+      />
+      <h3>Add a new Person (with phone number)</h3>
+      <PersonForm
+        onSubmit={handleAddPerson}
+        onNameInputChange={handleInputName}
+        nameValue={newName}
+        onNumberInputChange={handleInputNumber}
+        numberValue={newNumber}
+      />
+
       <h2>Numbers</h2>
-      {persons
-        .filter((p) => p.name.toLowerCase().includes(nameFilter.toLowerCase()))
-        .map((p) => {
-          return (
-            <p key={p.name}>
-              {p.name} {p.number}
-            </p>
-          );
-        })}
+      <Persons persons={persons} nameFilter={nameFilter} />
     </div>
   );
 };
