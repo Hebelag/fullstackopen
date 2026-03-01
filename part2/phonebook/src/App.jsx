@@ -138,7 +138,6 @@ const App = () => {
       />
       <h3>Add a new Person (with phone number)</h3>
       <ErrorNotification message={errorMessage} />
-      <ErrorNotification message={"Debug!"} />
       <PersonForm
         onSubmit={handleAddPerson}
         onNameInputChange={handleInputName}
