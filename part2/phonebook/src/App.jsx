@@ -46,11 +46,20 @@ const Persons = ({ persons, nameFilter, deletePerson }) => {
     });
 };
 
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <div className="errorField">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [nameFilter, setNameFilter] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const fetchAllPersons = () => {
     personService.getAll().then((persons) => {
@@ -90,9 +99,12 @@ const App = () => {
           setPersons(persons.concat(newPerson));
           setNewName("");
           setNewNumber("");
-          console.log(
-            `${newPerson.name} was successfully added to the database`,
+          setErrorMessage(
+            `${newPerson.name} was successfully added to the phonebook!`,
           );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 1000);
         });
       }
     });
@@ -125,6 +137,8 @@ const App = () => {
         nameFilter={nameFilter}
       />
       <h3>Add a new Person (with phone number)</h3>
+      <ErrorNotification message={errorMessage} />
+      <ErrorNotification message={"Debug!"} />
       <PersonForm
         onSubmit={handleAddPerson}
         onNameInputChange={handleInputName}
