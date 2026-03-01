@@ -1,4 +1,17 @@
 .errorField {
+  color: red;
+  padding: 6px;
+  margin-bottom: 5px;
+  font-size: 22px;
+  border-radius: 4px;
+  border-color: red;
+  border: 2px;
+  border-style: solid;
+
+  background-color: rgb(192, 192, 192);
+}
+
+.confirmation {
   color: green;
   padding: 6px;
   margin-bottom: 5px;

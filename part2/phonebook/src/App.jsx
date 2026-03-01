@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import personService from "./services/persons";
 
 const Filter = ({ onHandleNameFilter, nameFilter }) => {
@@ -46,12 +45,16 @@ const Persons = ({ persons, nameFilter, deletePerson }) => {
     });
 };
 
-const ErrorNotification = ({ message }) => {
+const ErrorNotification = ({ message, isError }) => {
   if (message === null) {
     return null;
   }
 
-  return <div className="errorField">{message}</div>;
+  if (isError) {
+    return <div className="errorField">{message}</div>;
+  } else {
+    return <div className="confirmation">{message}</div>;
+  }
 };
 
 const App = () => {
@@ -60,6 +63,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
 
   const fetchAllPersons = () => {
     personService.getAll().then((persons) => {
@@ -77,37 +81,55 @@ const App = () => {
     const personObject = { name: newName, number: newNumber };
     event.preventDefault();
 
-    personService.getByName(personObject.name).then((foundPerson) => {
-      if (foundPerson) {
-        const confirmChangeNumber = confirm(
-          `${foundPerson.name} is already added to phonebook, replace the old number with a new one?`,
-        );
-        if (confirmChangeNumber) {
-          personService
-            .updateNumber(personObject, foundPerson.id)
-            .then((response) => {
-              console.log("update persons");
-              setPersons(
-                persons.map((p) =>
-                  p.id === foundPerson.id ? response.data : p,
-                ),
-              );
-            });
-        }
-      } else {
-        personService.create(personObject).then((newPerson) => {
-          setPersons(persons.concat(newPerson));
-          setNewName("");
-          setNewNumber("");
-          setErrorMessage(
-            `${newPerson.name} was successfully added to the phonebook!`,
+    personService
+      .getByName(personObject.name)
+      .then((foundPerson) => {
+        if (foundPerson) {
+          const confirmChangeNumber = confirm(
+            `${foundPerson.name} is already added to phonebook, replace the old number with a new one?`,
           );
-          setTimeout(() => {
-            setErrorMessage(null);
-          }, 1000);
-        });
-      }
-    });
+          if (confirmChangeNumber) {
+            personService
+              .updateNumber(personObject, foundPerson.id)
+              .then((response) => {
+                console.log("update persons");
+                setPersons(
+                  persons.map((p) =>
+                    p.id === foundPerson.id ? response.data : p,
+                  ),
+                );
+              })
+              .catch((error) => console.log("uh oh", error));
+          }
+        } else {
+          if (persons.find((p) => p.name === personObject.name)) {
+            setIsError(true);
+            setErrorMessage(
+              `Information of ${personObject.name} has already been removed from the server.`,
+            );
+            personService.getAll().then((persons) => setPersons(persons));
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 1000);
+            return;
+          }
+          personService.create(personObject).then((newPerson) => {
+            setPersons(persons.concat(newPerson));
+            setNewName("");
+            setNewNumber("");
+            setErrorMessage(
+              `${newPerson.name} was successfully added to the phonebook!`,
+            );
+            setIsError(false);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 1000);
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("uh oh 2 ", error);
+      });
   };
 
   const handleInputName = (event) => {
@@ -137,7 +159,7 @@ const App = () => {
         nameFilter={nameFilter}
       />
       <h3>Add a new Person (with phone number)</h3>
-      <ErrorNotification message={errorMessage} />
+      <ErrorNotification message={errorMessage} isError={isError} />
       <PersonForm
         onSubmit={handleAddPerson}
         onNameInputChange={handleInputName}
