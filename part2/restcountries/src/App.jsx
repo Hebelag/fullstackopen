@@ -1,6 +1,23 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+const CountryDetail = ({ country }) => {
+  return (
+    <div className="countryDetail" key={country.name.common}>
+      <h2>{country.name.common}</h2>
+      <p>Capital {country.capital}</p>
+      <p>Area {country.area}</p>
+      <p>Languages</p>
+      <ul>
+        {Object.values(country.languages).map((lang) => (
+          <li key={lang}>{lang}</li>
+        ))}
+      </ul>
+      <img src={country.flags.png} alt={country.flags.alt} />
+    </div>
+  );
+};
+
 const fetchAllCountries = () => {
   const countries = axios.get(
     "https://studies.cs.helsinki.fi/restcountries/api/all",
@@ -25,6 +42,7 @@ const App = () => {
       <p>
         Find Countries
         <input
+          value={searchCountry}
           onChange={(e) => {
             setSearchCountry(e.target.value);
             setFilteredCountries(
@@ -41,8 +59,20 @@ const App = () => {
       {filteredCountries.length < 1 && <p>No results</p>}
       {filteredCountries.length >= 2 && filteredCountries.length <= 10 && (
         <div className="filteredCountries">
-          {filteredCountries.map((c) => {
-            return <p key={c}>{c}</p>;
+          {filteredCountries.map((cName) => {
+            return (
+              <p key={cName}>
+                {cName}{" "}
+                <button
+                  onClick={() => {
+                    setSearchCountry(cName);
+                    setFilteredCountries([cName]);
+                  }}
+                >
+                  Show
+                </button>
+              </p>
+            );
           })}
         </div>
       )}
@@ -54,20 +84,7 @@ const App = () => {
             );
           })
           .map((c) => {
-            return (
-              <div className="countryDetail" key={c.name.common}>
-                <h2>{c.name.common}</h2>
-                <p>Capital {c.capital}</p>
-                <p>Area {c.area}</p>
-                <p>Languages</p>
-                <ul>
-                  {Object.values(c.languages).map((lang) => (
-                    <li key={lang}>{lang}</li>
-                  ))}
-                </ul>
-                <img src={c.flags.png} alt={c.flags.alt} />
-              </div>
-            );
+            return <CountryDetail country={c} />;
           })}
     </div>
   );
