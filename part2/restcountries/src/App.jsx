@@ -1,6 +1,38 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+const WeatherInfo = ({ capital }) => {
+  const [weather, setWeather] = useState(null);
+  const api_key = import.meta.env.VITE_WEATHER_API_KEY;
+
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}&units=metric`,
+      )
+      .then((response) => {
+        setWeather(response.data);
+      })
+      .catch((error) => console.log("Weather error:", error));
+  }, [capital, api_key]);
+
+  if (!weather) {
+    return <p>Loading weather...</p>;
+  }
+
+  const iconID = weather.weather[0].icon;
+  const imgIconUrl = `https://openweathermap.org/img/wn/${iconID}@2x.png`;
+
+  return (
+    <div className="weatherInfo">
+      <h3>Weather in {capital}</h3>
+      <p>Temperature {weather.main.temp.toFixed(2)} °C</p>
+      <img src={imgIconUrl} alt="weather icon" />
+      <p>Wind {weather.wind.speed} m/s</p>
+    </div>
+  );
+};
+
 const CountryDetail = ({ country }) => {
   return (
     <div className="countryDetail" key={country.name.common}>
@@ -14,6 +46,7 @@ const CountryDetail = ({ country }) => {
         ))}
       </ul>
       <img src={country.flags.png} alt={country.flags.alt} />
+      <WeatherInfo capital={country.capital} />
     </div>
   );
 };
