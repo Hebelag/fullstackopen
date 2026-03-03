@@ -56,7 +56,21 @@ app.delete("/api/persons/:id", (req,res) => {
 
 app.post("/api/persons/", (req,res) => {
     const person = req.body
-
+    if (!person.name){
+        return res.status(400).json({
+            error: "name is missing!"
+        })
+    }
+    if (!person.number){
+        return res.status(400).json({
+            error: "number is missing!"
+        })
+    }
+    if (persons.find(p=>p.name === person.name)){
+        return res.status(400).json({
+            error: `Name ${person.name} already in database! Must be unique!`
+        })
+    }
     const newId = Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
     console.log(newId)
     person.id = String(newId);
