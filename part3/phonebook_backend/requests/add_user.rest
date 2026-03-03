@@ -5,3 +5,6 @@ Content-Type: application/json
     "name": "Milton Keynes", 
     "number": "31-4153-524678"
 }
+
+###
+GET http://localhost:3001/api/persons/

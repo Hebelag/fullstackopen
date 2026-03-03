@@ -57,11 +57,9 @@ app.delete("/api/persons/:id", (req,res) => {
 app.post("/api/persons/", (req,res) => {
     const person = req.body
 
-    const maxId = persons.length > 0
-        ? Math.max(...persons.map(p=>Number(p.id)))
-        : 0
-    console.log(person)
-    person.id = String(maxId + 1);
+    const newId = Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
+    console.log(newId)
+    person.id = String(newId);
     persons = persons.concat(person)
 
     res.json(person);
