@@ -1,19 +1,19 @@
 import axios from "axios";
 
-const url = `http://localhost:3001/api/persons/`;
+const baseUrl = `/api/persons/`;
 
 const getAll = () => {
-  const request = axios.get(url);
+  const request = axios.get(baseUrl);
   return request.then((response) => response.data);
 };
 
 const create = (newObject) => {
-  const request = axios.post(url, newObject);
+  const request = axios.post(baseUrl, newObject);
   return request.then((response) => response.data);
 };
 
 const deletePerson = (id) => {
-  const deleteUrl = url + id;
+  const deleteUrl = baseUrl + id;
   return axios.delete(deleteUrl);
 };
 
@@ -24,7 +24,7 @@ const getByName = (name) => {
 };
 
 const updateNumber = (newPerson, id) => {
-  const request = axios.patch(url + id, newPerson);
+  const request = axios.patch(baseUrl + id, newPerson);
   return request;
 };
 
