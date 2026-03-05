@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm install && npm run build && cp -r dist ../../part3/phonebook_backend",
+    "build:ui": "rm -rf dist && npm install && cd ../../part2/phonebook && npm install && npm run build && cp -r dist ../../part3/phonebook_backend",
     "build:ui_win": "@powershell Remove-Item -Recurse -Force dist && cd ../../part2/phonebook && npm run build && @powershell Copy-Item dist -Recurse ../../part3/phonebook_backend",
     "start": "node index.js",
     "dev": "node --watch index.js",
@@ -15,7 +15,6 @@
     "deploy:full": "npm run build:ui && npm start"
   },
   "dependencies": {
-    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mongodb": "^7.1.0",
