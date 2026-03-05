@@ -1,105 +1,95 @@
-const express = require("express")
-const cors = require("cors")
-const app = express()
-let morgan = require("morgan")
-app.use(cors())
-app.use(express.json())
-app.use(express.static('dist'))
-app.use(morgan((tokens,req,res) => {
-    return[
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens.res(req, res, 'content-length'), '-',
-    tokens['response-time'](req, res), 'ms',
-    JSON.stringify(req.body)
-    ].join(' ')
-}))
+const express = require("express");
+require("dotenv").config();
+const Person = require("./models/person");
 
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+const app = express();
+
+let morgan = require("morgan");
+app.use(express.json());
+app.use(express.static("dist"));
+app.use(
+  morgan((tokens, req, res) => {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, "content-length"),
+      "-",
+      tokens["response-time"](req, res),
+      "ms",
+      JSON.stringify(req.body),
+    ].join(" ");
+  }),
+);
+
+const PORT = process.env.PORT;
 
 app.get("/api/persons", (req, res) => {
-    res.json(persons);
-})
+  Person.find({}).then((result) => {
+    res.json(result);
+  });
+});
 
-app.get("/api/persons/:id", (req,res) => {
-    const id = req.params.id
-    const person = persons.find(p => p.id === id)
+app.get("/api/persons/:id", (req, res) => {
+  const id = req.params.id;
 
-    if (person){
-        res.json(person)
-    } else {
-        res.status(404).end();
-    }
-})
+  Person.findById(id)
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => {
+      console.log(`Error finding Person with id: ${id}: `, error);
+    });
+});
 
-app.delete("/api/persons/:id", (req,res) => {
-    const id = req.params.id
+app.delete("/api/persons/:id", (req, res) => {
+  const id = req.params.id;
 
-    const exists = persons.find(p => p.id === id)
-    if (!exists){
-        res.status(404).end()
-    }
-    persons = persons.filter(p => p.id !== id);
-    res.status(204).end()
+  Person.findByIdAndDelete(id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((error) => {
+      res.status(404).end();
+    });
+});
 
+app.post("/api/persons/", (req, res) => {
+  const body = req.body;
+  if (!body.name) {
+    return res.status(400).json({
+      error: "name is missing!",
+    });
+  }
+  if (!body.number) {
+    return res.status(400).json({
+      error: "number is missing!",
+    });
+  }
+  //   Person.findOne({ name: body.name }).then((result) => {
+  //     if (result) {
+  //       return res.status(400).json({
+  //         error: `Name ${body.name} already in database! Must be unique!`,
+  //       });
+  //     }
+  //   });
 
-})
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  });
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
+});
 
-app.post("/api/persons/", (req,res) => {
-    const person = req.body
-    if (!person.name){
-        return res.status(400).json({
-            error: "name is missing!"
-        })
-    }
-    if (!person.number){
-        return res.status(400).json({
-            error: "number is missing!"
-        })
-    }
-    if (persons.find(p=>p.name === person.name)){
-        return res.status(400).json({
-            error: `Name ${person.name} already in database! Must be unique!`
-        })
-    }
-    const newId = Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
-    person.id = String(newId);
-    persons = persons.concat(person)
+app.get("/info", (req, res) => {
+  Person.countDocuments({}).then((result) => {
+    const currentTime = new Date();
+    res.send(`Phonebook has info for ${result} people. <br/>${currentTime}`);
+  });
+});
 
-    res.json(person);
-    
-})
-
-app.get("/info", (req,res) => {
-    const numPersons = persons.length
-    const currentTime = new Date()
-    res.send(`Phonebook has info for ${numPersons} people. <br/>${currentTime}`)
-
-})
-
-const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});
