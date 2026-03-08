@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = `/api/persons`;
+const baseUrl = `/api/persons/`;
 
 const getAll = () => {
   const request = axios.get(baseUrl);
@@ -24,7 +24,7 @@ const getByName = (name) => {
 };
 
 const updateNumber = (newPerson, id) => {
-  const request = axios.patch(baseUrl + id, newPerson);
+  const request = axios.put(baseUrl + id, newPerson);
   return request;
 };
 

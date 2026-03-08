@@ -5,8 +5,8 @@ const Person = require("./models/person");
 const app = express();
 
 let morgan = require("morgan");
-app.use(express.json());
 app.use(express.static("dist"));
+app.use(express.json());
 app.use(
   morgan((tokens, req, res) => {
     return [
@@ -30,28 +30,47 @@ app.get("/api/persons", (req, res) => {
   });
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
 
   Person.findById(id)
-    .then((result) => {
-      res.json(result);
+    .then((person) => {
+      if (person) {
+        res.json(person);
+      } else {
+        res.status(404).end();
+      }
     })
-    .catch((error) => {
-      console.log(`Error finding Person with id: ${id}: `, error);
-    });
+    .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
 
   Person.findByIdAndDelete(id)
     .then((result) => {
       res.status(204).end();
     })
-    .catch((error) => {
-      res.status(404).end();
-    });
+    .catch((error) => next(error));
+});
+
+app.put("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id;
+  const { name, number } = req.body;
+
+  Person.findById(id)
+    .then((person) => {
+      if (!person) {
+        return res.status(404).end();
+      }
+      person.name = name;
+      person.number = number;
+
+      return person.save().then((updatedPerson) => {
+        res.json(updatedPerson);
+      });
+    })
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons/", (req, res) => {
@@ -89,6 +108,18 @@ app.get("/info", (req, res) => {
     res.send(`Phonebook has info for ${result} people. <br/>${currentTime}`);
   });
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
