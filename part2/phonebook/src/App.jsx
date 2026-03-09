@@ -99,7 +99,13 @@ const App = () => {
                   ),
                 );
               })
-              .catch((error) => console.log("uh oh", error));
+              .catch((error) => {
+                setIsError(true);
+                setErrorMessage(`${error}`);
+                setTimeout(() => {
+                  setErrorMessage(null);
+                }, 1500);
+              });
           }
         } else {
           if (persons.find((p) => p.name === personObject.name)) {
@@ -113,22 +119,35 @@ const App = () => {
             }, 1000);
             return;
           }
-          personService.create(personObject).then((newPerson) => {
-            setPersons(persons.concat(newPerson));
-            setNewName("");
-            setNewNumber("");
-            setErrorMessage(
-              `${newPerson.name} was successfully added to the phonebook!`,
-            );
-            setIsError(false);
-            setTimeout(() => {
-              setErrorMessage(null);
-            }, 1000);
-          });
+          personService
+            .create(personObject)
+            .then((newPerson) => {
+              setPersons(persons.concat(newPerson));
+              setNewName("");
+              setNewNumber("");
+              setErrorMessage(
+                `${newPerson.name} was successfully added to the phonebook!`,
+              );
+              setIsError(false);
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 1000);
+            })
+            .catch((error) => {
+              setIsError(true);
+              setErrorMessage(`${error.response.data.error}`);
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 1500);
+            });
         }
       })
       .catch((error) => {
-        console.log("uh oh 2 ", error);
+        setIsError(true);
+        setErrorMessage(`${error}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1500);
       });
   };
 
