@@ -3,16 +3,6 @@ const mongoose = require('mongoose')
 
 dns.setServers(['1.1.1.1'])
 
-const url = process.env.MONGODB_URI
-mongoose.set('strictQuery', false)
-mongoose
-  .connect(url, { family: 4 })
-  .then(() => {
-    console.log('Connected to MongoDB!')
-  })
-  .catch((error) => {
-    console.log('Error connecting to MongoDB: ', error.message)
-  })
 const personSchema = new mongoose.Schema({
   name: {
     type: String,

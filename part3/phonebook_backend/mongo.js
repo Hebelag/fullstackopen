@@ -1,6 +1,6 @@
 const dns = require('dns')
 const mongoose = require('mongoose')
-
+const config = require('./utils/config')
 dns.setServers(['1.1.1.1'])
 
 if (process.argv.length < 3) {
@@ -9,10 +9,8 @@ if (process.argv.length < 3) {
   )
   process.exit(1)
 }
-const password = process.argv[2]
-const url = `mongodb+srv://dennis:${password}@cluster0.kwwxu93.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0`
 mongoose.set('strictQuery', false)
-mongoose.connect(url, { family: 4 })
+mongoose.connect(config.MONGODB_URI, { family: 4 })
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
