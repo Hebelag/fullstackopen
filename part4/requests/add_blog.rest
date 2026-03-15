@@ -1,0 +1,13 @@
+POST http://localhost:3003/api/blogs/
+Content-Type: application/json
+
+{
+    "title": "Ultra White", 
+    "author": "Monster Energy",
+    "url": "http://google.com",
+    "likes": "254"
+
+}
+
+###
+GET http://localhost:3003/api/blogs/
