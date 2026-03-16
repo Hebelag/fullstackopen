@@ -10,9 +10,24 @@ const totalLikes = (blogs) => {
 }
 
 const favoriteBlog = (blogs) => {
-    return blogs.sort((a,b) => a.likes - b.likes)[blogs.length - 1]
+    return blogs.sort((a,b) => b.likes - a.likes)[0]
+}
+
+const mostBlogs = (blogs) => {
+    const blogPerAuthor = blogs.map((a) => {
+        return a.author
+    }).reduce((sum, item) => {
+        sum[item] ? sum[item]++ : sum[item] = 1
+        return sum
+    },{})
+    const bestBlogger = Object.entries(blogPerAuthor).sort((a,b) => b[1]-a[1])[0]
+    return {
+        "author": bestBlogger[0],
+        "blogs": bestBlogger[1]
+    }
+    
 }
 
 module.exports = {
-  dummy, totalLikes, favoriteBlog
+  dummy, totalLikes, favoriteBlog, mostBlogs
 }
