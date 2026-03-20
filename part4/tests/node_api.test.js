@@ -13,6 +13,7 @@ title: String,
   url: String,
   likes: Number,
 */
+
 const initialBlogs = [
   {
     title: 'Monster Energy White',
@@ -54,6 +55,71 @@ test('a specific blog is within the returned blogs', async () => {
 
   const contents = response.body.map(e => e.author)
   assert.strictEqual(contents.includes('Monster'), true)
+})
+
+test('a valid blog can be added (api route test) ', async () => {
+  const newBlog = {
+    title: 'Monster Energy Black',
+    author: 'Monster',
+    url: 'https://monster.energy/black',
+    likes: 1337
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const title = response.body.map(r => r.title)
+
+  assert.strictEqual(response.body.length, initialBlogs.length +1)
+
+  assert(title.includes('Monster Energy Black'))
+})
+
+test('if likes not present, default to 0', async () => {
+  const newBlog = {
+    title: 'Monster Energy Gray',
+    author: 'Monster',
+    url: 'https://monster.energy/gray'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const like = response.body.map(r => r.likes)
+  assert(like.includes('0'))
+})
+
+test.only('if title is missing, return 400', async () => {
+  const newBlog = {
+    author: 'Monster',
+    url: 'https://monster.energy/gray',
+    likes: 1738
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test.only('if url is missing, return 400', async () => {
+  const newBlog = {
+    title: 'Monster Energy Gray',
+    author: 'Monster',
+    likes: 1738
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
 
 after(async () => {
