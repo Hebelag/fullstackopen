@@ -122,7 +122,7 @@ test('if url is missing, return 400', async () => {
     .expect(400)
 })
 
-test.only('add and delete a post, returning 204', async () => {
+test('add and delete a post, returning 204', async () => {
   const newBlog = {
     title: 'Monster Energy Yellow',
     author: 'Monster',
@@ -147,6 +147,38 @@ test.only('add and delete a post, returning 204', async () => {
 
   const deleteResponse = await api.get('/api/blogs')
   assert.strictEqual(deleteResponse.body.length,initialBlogs.length)
+})
+
+test.only('add and update post from 12345 likes to 12347 likes', async () => {
+  const newBlog = {
+    title: 'Monster Energy Green',
+    author: 'Monster',
+    url: 'https://monster.energy/green',
+    likes: 12345
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const id = response.body.map(r => r.id)[response.body.length - 1]
+
+  const newLikes = { likes: 12347 }
+
+  await api
+    .put(`/api/blogs/${id}`)
+    .send(newLikes)
+    .expect(201)
+
+  const putResponse = await api.get('/api/blogs')
+  const likes = putResponse.body.map(r => r.likes)[putResponse.body.length - 1]
+
+  assert.strictEqual(likes, '12347')
+
 })
 
 after(async () => {
