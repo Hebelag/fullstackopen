@@ -98,7 +98,7 @@ test('if likes not present, default to 0', async () => {
   assert(like.includes('0'))
 })
 
-test.only('if title is missing, return 400', async () => {
+test('if title is missing, return 400', async () => {
   const newBlog = {
     author: 'Monster',
     url: 'https://monster.energy/gray',
@@ -110,7 +110,7 @@ test.only('if title is missing, return 400', async () => {
     .expect(400)
 })
 
-test.only('if url is missing, return 400', async () => {
+test('if url is missing, return 400', async () => {
   const newBlog = {
     title: 'Monster Energy Gray',
     author: 'Monster',
@@ -120,6 +120,33 @@ test.only('if url is missing, return 400', async () => {
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
+})
+
+test.only('add and delete a post, returning 204', async () => {
+  const newBlog = {
+    title: 'Monster Energy Yellow',
+    author: 'Monster',
+    url: 'https://monster.energy/yellow',
+    likes: 12345
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const id = response.body.map(r => r.id)[response.body.length - 1]
+  console.log(id)
+
+  await api
+    .delete(`/api/blogs/${id}`)
+    .expect(204)
+
+  const deleteResponse = await api.get('/api/blogs')
+  assert.strictEqual(deleteResponse.body.length,initialBlogs.length)
 })
 
 after(async () => {

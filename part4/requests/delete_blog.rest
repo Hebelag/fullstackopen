@@ -1,0 +1,17 @@
+POST http://localhost:3003/api/blogs/
+Content-Type: application/json
+
+{
+    "title": "Ultra White", 
+    "author": "Monster Energy",
+    "url": "http://google.com",
+    "likes": "254"
+
+}
+
+###
+
+DELETE http://localhost:3003/api/blogs/69bd9813e8de9e7a6ff2a9c1
+
+###
+GET http://localhost:3003/api/blogs/
