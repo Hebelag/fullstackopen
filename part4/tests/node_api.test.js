@@ -3,6 +3,8 @@ const { test, after, beforeEach } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const helper = require('./test_helper')
+
 const Blog = require('../models/blog')
 
 const api = supertest(app)
@@ -14,26 +16,13 @@ title: String,
   likes: Number,
 */
 
-const initialBlogs = [
-  {
-    title: 'Monster Energy White',
-    author: 'Monster',
-    url: 'https://monster.energy/white',
-    likes: 666
-  },
-  {
-    title: 'Monster Energy Pink',
-    author: 'Monster',
-    url: 'https://monster.energy/pink',
-    likes: 666
-  }
-]
+
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
+  let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
+  blogObject = new Blog(helper.initialBlogs[1])
   await blogObject.save()
 })
 
@@ -71,11 +60,11 @@ test('a valid blog can be added (api route test) ', async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
+  const blogsAtEnd = await helper.blogsInDb()
 
-  const title = response.body.map(r => r.title)
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length +1)
 
-  assert.strictEqual(response.body.length, initialBlogs.length +1)
+  const title = blogsAtEnd.map(r => r.title)
 
   assert(title.includes('Monster Energy Black'))
 })
@@ -139,14 +128,13 @@ test('add and delete a post, returning 204', async () => {
   const response = await api.get('/api/blogs')
 
   const id = response.body.map(r => r.id)[response.body.length - 1]
-  console.log(id)
 
   await api
     .delete(`/api/blogs/${id}`)
     .expect(204)
 
   const deleteResponse = await api.get('/api/blogs')
-  assert.strictEqual(deleteResponse.body.length,initialBlogs.length)
+  assert.strictEqual(deleteResponse.body.length,helper.initialBlogs.length)
 })
 
 test.only('add and update post from 12345 likes to 12347 likes', async () => {
@@ -181,6 +169,3 @@ test.only('add and update post from 12345 likes to 12347 likes', async () => {
 
 })
 
-after(async () => {
-  await mongoose.connection.close()
-})
