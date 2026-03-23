@@ -4,13 +4,23 @@ const dns = require('dns')
 dns.setServers(['1.1.1.1'])
 
 const userSchema = new mongoose.Schema({
-  username: String,
-  name: String,
-  passwordHash: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    minLength: 3
+  },
+  name: {
+    type: String
+  },
+  passwordHash: {
+    type: String,
+    required: true
+  },
   blogs: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Note'
+      ref: 'Blog'
     }
   ],
 })

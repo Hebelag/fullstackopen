@@ -1,11 +1,12 @@
 const assert = require('node:assert')
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, before } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
-
+const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -16,7 +17,20 @@ title: String,
   likes: Number,
 */
 
+before(async () => {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI)
+  }
+  await User.deleteMany({})
+  let passwordHash = await bcrypt.hash(helper.initialUsers[0].password, 10)
+  let userObject = new User({
+    username: helper.initialUsers[0].username,
+    name: helper.initialUsers[0].name,
+    passwordHash: passwordHash }
 
+  )
+  await userObject.save()
+})
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -24,6 +38,8 @@ beforeEach(async () => {
   await blogObject.save()
   blogObject = new Blog(helper.initialBlogs[1])
   await blogObject.save()
+
+
 })
 
 test('blogposts are returned as json', async () => {
@@ -169,3 +185,6 @@ test.only('add and update post from 12345 likes to 12347 likes', async () => {
 
 })
 
+after(async () => {
+  await mongoose.connection.close()
+})

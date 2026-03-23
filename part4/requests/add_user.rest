@@ -7,5 +7,6 @@ Content-Type: application/json
     "password":"Sport is good"
 
 }
+###
 
-#GET http://localhost:3003/api/users/
+GET http://localhost:3003/api/users/
