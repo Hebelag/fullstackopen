@@ -23,6 +23,18 @@ const initialUsers = [
   }
 ]
 
+const getToken = async (api) => {
+  const response = await api
+    .post('/api/login')
+    .send({ username: initialUsers[0].username, password: initialUsers[0].password })
+  if (!response.body.token) {
+    console.error('Login failed! Status:', response.status)
+    console.error('Error message:', response.body.error)
+  }
+
+  return response.body.token
+}
+
 const nonExistingId = async () => {
   const blog = new Blog({
     title: 'willremovethissoon',
@@ -46,5 +58,5 @@ const usersInDb = async () => {
 }
 
 module.exports = {
-  initialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb
+  initialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb, getToken
 }

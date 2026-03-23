@@ -8,6 +8,8 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const api = supertest(app)
 
+let token = null
+
 before(async () => {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.MONGODB_URI)
@@ -22,6 +24,7 @@ describe('when there is initially one user in db', () => {
     const user = new User({ username: helper.initialUsers[0].username, name: helper.initialUsers[0].name, passwordHash })
 
     await user.save()
+    token = await helper.getToken(api)
   })
 
   test('creation succeeds with a fresh username', async () => {
@@ -35,6 +38,7 @@ describe('when there is initially one user in db', () => {
 
     await api
       .post('/api/users')
+      .set('Authorization', `Bearer ${token}`)
       .send(newUser)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -57,6 +61,7 @@ describe('when there is initially one user in db', () => {
 
     const result = await api
       .post('/api/users')
+      .set('Authorization', `Bearer ${token}`)
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/)
@@ -76,6 +81,7 @@ describe('when there is initially one user in db', () => {
 
     const result = await api
       .post('/api/users')
+      .set('Authorization', `Bearer ${token}`)
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/)

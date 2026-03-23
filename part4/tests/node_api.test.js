@@ -16,6 +16,8 @@ title: String,
   url: String,
   likes: Number,
 */
+// token must be aquired in before method
+let token = null
 
 before(async () => {
   if (mongoose.connection.readyState === 0) {
@@ -26,10 +28,10 @@ before(async () => {
   let userObject = new User({
     username: helper.initialUsers[0].username,
     name: helper.initialUsers[0].name,
-    passwordHash: passwordHash }
-
-  )
+    passwordHash: passwordHash
+  })
   await userObject.save()
+  token = await helper.getToken(api)
 })
 
 beforeEach(async () => {
@@ -45,18 +47,24 @@ beforeEach(async () => {
 test('blogposts are returned as json', async () => {
   await api
     .get('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
 
 test('all blogposts are returned', async () => {
-  const response = await api.get('/api/blogs')
+  const response = await api
+    .get('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+
 
   assert.strictEqual(response.body.length, 2)
 })
 
 test('a specific blog is within the returned blogs', async () => {
-  const response = await api.get('/api/blogs')
+  const response = await api
+    .get('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
 
   const contents = response.body.map(e => e.author)
   assert.strictEqual(contents.includes('Monster'), true)
@@ -72,6 +80,7 @@ test('a valid blog can be added (api route test) ', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -94,11 +103,12 @@ test('if likes not present, default to 0', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
+  const response = await api.get('/api/blogs').set('Authorization', `Bearer ${token}`)
   const like = response.body.map(r => r.likes)
   assert(like.includes('0'))
 })
@@ -111,6 +121,7 @@ test('if title is missing, return 400', async () => {
   }
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(400)
 })
@@ -123,6 +134,7 @@ test('if url is missing, return 400', async () => {
   }
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(400)
 })
@@ -137,19 +149,21 @@ test('add and delete a post, returning 204', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
+  const response = await api.get('/api/blogs').set('Authorization', `Bearer ${token}`)
 
   const id = response.body.map(r => r.id)[response.body.length - 1]
 
   await api
     .delete(`/api/blogs/${id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
-  const deleteResponse = await api.get('/api/blogs')
+  const deleteResponse = await api.get('/api/blogs').set('Authorization', `Bearer ${token}`)
   assert.strictEqual(deleteResponse.body.length,helper.initialBlogs.length)
 })
 
@@ -163,11 +177,12 @@ test.only('add and update post from 12345 likes to 12347 likes', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
+  const response = await api.get('/api/blogs').set('Authorization', `Bearer ${token}`)
 
   const id = response.body.map(r => r.id)[response.body.length - 1]
 
@@ -175,10 +190,11 @@ test.only('add and update post from 12345 likes to 12347 likes', async () => {
 
   await api
     .put(`/api/blogs/${id}`)
+    .set('Authorization', `Bearer ${token}`)
     .send(newLikes)
     .expect(201)
 
-  const putResponse = await api.get('/api/blogs')
+  const putResponse = await api.get('/api/blogs').set('Authorization', `Bearer ${token}`)
   const likes = putResponse.body.map(r => r.likes)[putResponse.body.length - 1]
 
   assert.strictEqual(likes, '12347')

@@ -1,5 +1,6 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNhbGlzZGVubmljcyIsImlkIjoiNjljMDQzNmZiMDk1YWIwMDk0MGEyNGVlIiwiaWF0IjoxNzc0MjY5MTkxfQ.ThIlZcdOUVNqtbIsqmVZ_v5j_7BuYhpB18L5wRNH39s
 
 {
     "title": "Ultra White", 
@@ -11,7 +12,9 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3003/api/blogs/69bd9813e8de9e7a6ff2a9c1
+DELETE http://localhost:3003/api/blogs/69c140058458488e6669bda0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNhbGlzZGVubmljcyIsImlkIjoiNjljMDQzNmZiMDk1YWIwMDk0MGEyNGVlIiwiaWF0IjoxNzc0MjY5MTkxfQ.ThIlZcdOUVNqtbIsqmVZ_v5j_7BuYhpB18L5wRNH39s
 
 ###
 GET http://localhost:3003/api/blogs/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNhbGlzZGVubmljcyIsImlkIjoiNjljMDQzNmZiMDk1YWIwMDk0MGEyNGVlIiwiaWF0IjoxNzc0MjY5MTkxfQ.ThIlZcdOUVNqtbIsqmVZ_v5j_7BuYhpB18L5wRNH39s
