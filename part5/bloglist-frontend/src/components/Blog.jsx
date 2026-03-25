@@ -11,20 +11,20 @@ const Blog = ({ blog, addLike, deleteBlog, user }) => {
   }
 
   return(
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       {blog.title} {blog.author} <button onClick={() => {setInfoVisible(!infoVisible)}}>{infoVisible ? 'hide':'view'}</button>
       {infoVisible &&
-    <div>
-      <p>{blog.url}</p>
-      <p>likes {blog.likes} <button onClick={() => addLike({ ...blog, likes: blog.likes + 1 })}>like</button></p>
-      {blog.user &&
-        <p>{blog.user.username}</p>
+      <div>
+        <p>{blog.url}</p>
+        <p>likes {blog.likes} <button onClick={() => addLike({ ...blog, likes: blog.likes + 1 })}>like</button></p>
+        {blog.user &&
+          <p>{blog.user.username}</p>
 
-      }
-      {(blog.user && blog.user.username === user.username) && <button onClick={() => deleteBlog(blog)}>delete</button>}
+        }
+        {(blog.user && blog.user.username === user.username) && <button onClick={() => deleteBlog(blog)}>delete</button>}
 
 
-    </div>}
+      </div>}
     </div>
   )
 }

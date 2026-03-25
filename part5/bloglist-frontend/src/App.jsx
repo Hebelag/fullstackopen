@@ -11,9 +11,6 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlogTitle, setNewBlogTitle] = useState('')
-  const [newBlogAuthor, setNewBlogAuthor] = useState('')
-  const [newBlogUrl, setNewBlogUrl] = useState('')
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -45,14 +42,7 @@ const App = () => {
     }))
   }
 
-  const addBlog = async event => {
-    event.preventDefault()
-    const blogObject = {
-      title: newBlogTitle,
-      author: newBlogAuthor,
-      url: newBlogUrl,
-      likes: 0
-    }
+  const addBlog = async (blogObject) => {
 
     const returnedBlog = await blogService.create(blogObject)
 
@@ -61,9 +51,6 @@ const App = () => {
     setTimeout(() => {
       setNotification(null)
     }, 5000)
-    setNewBlogTitle('')
-    setNewBlogAuthor('')
-    setNewBlogUrl('')
   }
 
   const sortBlogsByLikes = () => {
@@ -137,13 +124,7 @@ const App = () => {
     return (
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <BlogForm
-          newBlogAuthor={newBlogAuthor}
-          newBlogTitle={newBlogTitle}
-          newBlogUrl={newBlogUrl}
           handleAddBlog={addBlog}
-          handleAuthorChange={({ target }) => {setNewBlogAuthor(target.value)}}
-          handleTitleChange={({ target }) => {setNewBlogTitle(target.value)}}
-          handleUrlChange={({ target }) => {setNewBlogUrl(target.value)}}
         />
       </Togglable>
     )
