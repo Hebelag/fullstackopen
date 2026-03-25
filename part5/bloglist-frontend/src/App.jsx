@@ -15,7 +15,7 @@ const App = () => {
   const [newBlogAuthor, setNewBlogAuthor] = useState('')
   const [newBlogUrl, setNewBlogUrl] = useState('')
 
-  const [username, setUsername] = useState('') 
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState('')
@@ -26,7 +26,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -39,9 +39,9 @@ const App = () => {
   }, [])
 
   const addLike = async (newBlog) => {
-    const returnedBlog = await blogService.update(newBlog.id, {...newBlog, userId: newBlog.user.id})
+    const returnedBlog = await blogService.update(newBlog.id, { ...newBlog, userId: newBlog.user.id })
     setBlogs(blogs.map(blog => {
-      return blog.id === returnedBlog.data.id ? {...blog, likes: returnedBlog.data.likes} : blog
+      return blog.id === returnedBlog.data.id ? { ...blog, likes: returnedBlog.data.likes } : blog
     }))
   }
 
@@ -55,7 +55,7 @@ const App = () => {
     }
 
     const returnedBlog = await blogService.create(blogObject)
-    
+
     setBlogs(blogs.concat(returnedBlog))
     setNotification(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
     setTimeout(() => {
@@ -89,12 +89,12 @@ const App = () => {
 
   const handleLogin = async event => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -115,19 +115,19 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
     blogService.setToken(null)
-    
+
   }
 
   const loginForm = () => {
     return (
       <Togglable buttonLabel='login' ref={loginFormRef}>
         <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({target}) => setUsername(target.value)}
-            handlePasswordChange={({target}) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />
 
       </Togglable>
     )
@@ -141,9 +141,9 @@ const App = () => {
           newBlogTitle={newBlogTitle}
           newBlogUrl={newBlogUrl}
           handleAddBlog={addBlog}
-          handleAuthorChange={({target}) => {setNewBlogAuthor(target.value)}}
-          handleTitleChange={({target}) => {setNewBlogTitle(target.value)}}
-          handleUrlChange={({target}) => {setNewBlogUrl(target.value)}}
+          handleAuthorChange={({ target }) => {setNewBlogAuthor(target.value)}}
+          handleTitleChange={({ target }) => {setNewBlogTitle(target.value)}}
+          handleUrlChange={({ target }) => {setNewBlogUrl(target.value)}}
         />
       </Togglable>
     )
@@ -155,20 +155,20 @@ const App = () => {
 
       {!user && loginForm()}
       {user && (
-      <div>
         <div>
-          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-          
-        </div>
-        {blogForm()}
-        <h2>blogs</h2>
-        <button onClick={sortBlogsByLikes}>Sort by Likes</button>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog} user={user} />
-        )}
+          <div>
+            <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
 
-      </div>
-    )}
+          </div>
+          {blogForm()}
+          <h2>blogs</h2>
+          <button onClick={sortBlogsByLikes}>Sort by Likes</button>
+          {blogs.map(blog =>
+            <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog} user={user} />
+          )}
+
+        </div>
+      )}
     </div>
   )
 }
