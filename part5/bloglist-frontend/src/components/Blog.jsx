@@ -9,6 +9,8 @@ const Blog = ({ blog, addLike, deleteBlog, user }) => {
     borderWidth: 1,
     marginBottom: 5
   }
+  console.log(`Blog: ${blog.title} User: ${blog.user.username}`)
+  console.log(`User who is logged in: ${user.username}`)
 
   return(
     <div style={blogStyle} className='blog'>

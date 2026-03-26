@@ -21,11 +21,12 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   if (!blog.title || !blog.url) {
     return response.status(400).send({ error: 'title or url missing' })
   }
-
+  const savedBlog = await blog.save()
+  await savedBlog.populate('user', {username: 1, name: 1})
+  
   user.blogs = user.blogs.concat(blog._id)
   await user.save()
 
-  const savedBlog = await blog.save()
 
   response.status(201).json(savedBlog)
 })
