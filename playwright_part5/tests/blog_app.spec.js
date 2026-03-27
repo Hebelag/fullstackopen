@@ -52,7 +52,62 @@ describe('Blog app', () => {
       await page.getByLabel('username').fill('TestingUser')
       await page.getByLabel('password').fill('test123')
       await page.getByRole('button', {name: 'login'}).last().click()
+      await page.getByRole('button', {name: 'logout'}).waitFor()
     })
+    
+    test('When logged in with a number of blogs in unsorted like order', async ({ page, request }) => {
+      const userJson = await page.evaluate(() => {
+        return window.localStorage.getItem('loggedBlogappUser')
+      })
+      const user = JSON.parse(userJson)
+
+      await request.post('http://localhost:3003/api/blogs', {
+        data: {
+          title: "LeastLikes",
+          author: "GoodAuthor",
+          url: "test123.com",
+          likes: 47
+        },
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      })
+      await request.post('http://localhost:3003/api/blogs', {
+        data: {
+          title: "MostLikes",
+          author: "GoodAuthor",
+          url: "test12345.com",
+          likes: 2342
+        },
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      })
+      await request.post('http://localhost:3003/api/blogs', {
+        data: {
+          title: "MiddleLikes",
+          author: "GoodAuthor",
+          url: "test1234.com",
+          likes: 1041
+        },
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      })
+
+      await page.reload()
+      await page.getByText("MiddleLikes").waitFor()
+
+      const notMostLikes = await page.locator('.blog').first().innerHTML()
+      expect(notMostLikes).not.toContain("Most")
+
+      await page.getByRole('button', {name: 'Sort by likes'}).waitFor()
+      await page.getByRole('button', {name: 'Sort by likes'}).click()
+
+      const mostLikes = await page.locator('.blog').first().innerHTML()
+      expect(mostLikes).toContain("Most")
+
+  })
 
     test('a new blog can be created', async ({ page }) => {
       await page.getByRole('button', {name: 'create new blog'}).click()
@@ -89,15 +144,41 @@ describe('Blog app', () => {
           console.log(dialog.message)
           dialog.accept()
         })
-        
+
         await page.getByRole('button', {name: 'view'}).click()
         await page.getByRole('button', {name: 'delete'}).click()
         
         await expect(page.getByText('AwesomeTitle Admin')).not.toBeVisible()
+      })
+
+      test('created blog can only be deleted by creator', async ({ page, request }) => {
+        // Create second user which is not the creator of the initial blog
+        await request.post('http://localhost:3003/api/users', {
+          data: {
+            username: "TestingUser2",
+            name: "Admin2",
+            password: "test123"
+          }
+        })
+
+        // Logout initial user and log in as second user
+        await page.getByRole('button', {name: 'logout'}).click()
+        await page.getByRole('button', {name: 'login'}).first().click()
+        await page.getByLabel('username').fill('TestingUser2')
+        await page.getByLabel('password').fill('test123')
+        await page.getByRole('button', {name: 'login'}).last().click()
+
+        // Expand existing blog
+        await page.getByRole('button', {name: 'view'}).click()
+        
+        // Delete button should NOT be visible!
+        await expect(page.getByRole('button', {name: 'delete'})).not.toBeVisible()
 
       })
     })
   })
+
+  
 
     
 
