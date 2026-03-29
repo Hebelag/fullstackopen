@@ -40,9 +40,7 @@ const reducer = (state = initialState, action) => {
 export const upvoteAnecdote = id => {
   return {
     type: 'UPVOTE',
-    payload: {
-      id
-    }
+    payload: {id}
   }
 }
 
