@@ -9,7 +9,6 @@ const notificationSlice = createSlice({
       return state
     },
     removeNotification(state, action){
-      console.log("removal is fired")
       state = ''
       return state
     }
@@ -18,5 +17,17 @@ const notificationSlice = createSlice({
 }
 )
 
-export const {createNotification, removeNotification} = notificationSlice.actions
+const { createNotification } = notificationSlice.actions
+
+export const showNotification = (text, delay) => {
+  const delayInMilliseconds = delay * 1000
+  return async (dispatch) => {
+    dispatch(createNotification(text))
+    setTimeout(() => {
+      dispatch(removeNotification())
+    }, delayInMilliseconds)
+  }
+}
+
+export const {removeNotification} = notificationSlice.actions
 export default notificationSlice.reducer
